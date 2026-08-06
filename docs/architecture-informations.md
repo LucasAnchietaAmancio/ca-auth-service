@@ -97,7 +97,6 @@
 │   │       ├── lock/         # Redis
 │   │       ├── notifier/     # e-mail de alerta
 │   │       └── schedule/     # node-cron
-├── prisma/
 ├── tests/
 ├── docker-compose.yml
 ├── .env.example

@@ -38,7 +38,6 @@ Arquitetura Hexagonal (Ports & Adapters): regras de negócio (`domain`) e casos 
 │   │       ├── lock/         # Redis
 │   │       ├── notifier/     # e-mail de alerta
 │   │       └── schedule/     # node-cron
-├── prisma/
 ├── tests/
 ├── docker-compose.yml
 ├── .env.example
