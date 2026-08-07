@@ -8,8 +8,7 @@ export default class SessionEntity {
     ){}
 
     public static create(cookieHeader: string, expiresAt: number, acessToken: string): SessionEntity {
-        const sessionId = crypto.randomUUID();
-        return new SessionEntity(sessionId, cookieHeader, expiresAt, acessToken);
+        return new SessionEntity(crypto.randomUUID(), cookieHeader, expiresAt, acessToken);
     }
 
     public get sessionId(): string {
