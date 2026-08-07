@@ -1,3 +1,25 @@
+## Versão 2 — suporte multiempresa
+
+O serviço é desenhado para autenticar várias empresas no ERP. Cada operação possui `companyId`, isolando sessões, locks, alertas e eventos.
+
+### Credenciais por empresa
+
+As credenciais do ERP não pertencem ao `.env`. Usuário, senha e segredo TOTP devem ser persistidos por empresa de forma criptografada com uma referência persistida no banco.
+
+O `.env` contém somente configuração do serviço: banco, Redis, RabbitMQ, SMTP e chave ou referência do mecanismo de criptografia.
+
+```text
+GenerateSessionUseCase(companyId)
+  → CompanyRepository busca empresa ativa
+  → CompanyRepository.findById() obtém credenciais protegidas
+  → Puppeteer autentica e captura sessão
+  → EventPublisher publica sessão autenticada
+```
+
+O Puppeteer não acessa banco ou `.env`: recebe as credenciais já resolvidas pelo caso de uso. O lock Redis é isolado por empresa: `auth:login-lock:{companyId}`. Em CAPTCHA, alteração de layout, credenciais inválidas ou indisponibilidade, o serviço classifica a falha, notifica e encerra sem retry automático. Alertas e logs não podem conter senha, TOTP, cookies ou access token.
+
+---
+
 ## Descrição do Projeto
  
 O `auth-service` é responsável pela autenticação junto ao ERP Conta Azul e pela publicação da sessão autenticada para os demais serviços do ecossistema (ex: `inventory-service`), via evento. Como a plataforma exige autenticação multifator (MFA/TOTP) e não expõe API pública para esse fluxo, o login é automatizado via navegador headless.
@@ -32,6 +54,7 @@ Arquitetura Hexagonal (Ports & Adapters): regras de negócio (`domain`) e casos 
 │   │   │   ├── value-objects/
 │   │   │   └── errors/
 │   │   └── adapters/
+│   │       ├── db/ 
 │   │       ├── scraper/      # Puppeteer (login)
 │   │       ├── totp/         # otplib
 │   │       ├── events/       # publisher RabbitMQ
@@ -63,6 +86,7 @@ Arquitetura Hexagonal (Ports & Adapters): regras de negócio (`domain`) e casos 
 - **Payload:**
 ```json
 {
+  "companyId": "uuid",
   "sessionId": "uuid",
   "cookieHeader": "string",
   "accessToken": "string",

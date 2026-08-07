@@ -31,6 +31,9 @@
 
 *RF008 - Enviar notificações de falha de autenticação, sem retry automático.*
 
+*RF009 - Persistir credenciais da empresa*
+
+
 ---
 
 ### **5. Catalogo de eventos**
@@ -91,6 +94,7 @@
 │   │   │   ├── value-objects/
 │   │   │   └── errors/
 │   │   └── adapters/
+│   │       ├── db/    
 │   │       ├── scraper/      # Puppeteer (login)
 │   │       ├── totp/         # otplib
 │   │       ├── events/       # publisher RabbitMQ

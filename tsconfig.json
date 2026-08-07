@@ -41,7 +41,9 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
     "paths": {
-      "@domain/*.js": ["./src/domain/*.ts"]
+      "@domain/*.js": ["./src/domain/*.ts"],
+      "@ports/*.js": ["./src/application/ports/*.ts"],
+      "@dto/*.js": ["./src/application/dto/*.ts"]
     }
   }
 }

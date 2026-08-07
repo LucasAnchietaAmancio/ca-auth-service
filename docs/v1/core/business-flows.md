@@ -6,6 +6,7 @@
 - Sessão inválida
 
 ### ***Fluxo principal***
+- Cadastrar empresa
 - Receber solicitação de autenticação.
 - Adquirir lock distribuído.
 - Verificar se o lock foi adquirido.
