@@ -23,7 +23,6 @@ export default class GenerateSessionUseCase implements GenerateSessionUseCasePor
             authenticationResult.cookieHeader,
             authenticationResult.expiresAt,
             authenticationResult.accessToken
-        )
-        
+        )   
     }
 }

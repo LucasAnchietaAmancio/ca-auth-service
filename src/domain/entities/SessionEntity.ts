@@ -1,6 +1,6 @@
 
 export default class SessionEntity {
-    public constructor(
+    private constructor(
         private readonly _sessionId: string,
         private cookieHeader: string,
         private expiresAt: number,

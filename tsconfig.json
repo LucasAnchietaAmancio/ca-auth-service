@@ -43,7 +43,8 @@
     "paths": {
       "@domain/*.js": ["./src/domain/*.ts"],
       "@ports/*.js": ["./src/application/ports/*.ts"],
-      "@dto/*.js": ["./src/application/dto/*.ts"]
+      "@dto/*.js": ["./src/application/dto/*.ts"],
+      "@exceptions/*.js": ["./src/domain/exceptions/*.ts"]
     }
   }
 }
