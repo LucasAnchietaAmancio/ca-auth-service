@@ -3,7 +3,7 @@
 #### **SessionEntity**
 
 ##### *Entrada*
-    pleaceHolder - String
+    cookieHeader - String
     expiresAt - Number
     acessToken - String 
 
