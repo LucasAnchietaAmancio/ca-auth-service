@@ -16,9 +16,7 @@ export default class EmailValueObject {
     }
 
     public static create(email: string): EmailValueObject {
-        if(!this.isValidEmail(email)) {
-            throw new InvalidEmailException("Email fornecido é inválido", "INVALID_EMAIL", { email });
-        }
+        if(!this.isValidEmail(email)) throw new InvalidEmailException("Email fornecido é inválido", "INVALID_EMAIL", { email });
         return new EmailValueObject(email);
     }
 }

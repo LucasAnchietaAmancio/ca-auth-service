@@ -17,7 +17,7 @@ export default class GenerateSessionUseCase implements GenerateSessionUseCasePor
 
         if(!company) throw new CompanyNotFoundError("Empresa não encontrada durante a busta", "NOT_FOUND", { companyId: dto.companyId });
 
-        const authenticationResult = await this.contaAzulPuppeteerAuthAdapter.execute(company.email, company.hashedPassword);
+        const authenticationResult = await this.contaAzulPuppeteerAuthAdapter.execute(company.email, company.password);
 
         return SessionEntity.create(
             authenticationResult.cookieHeader,

@@ -7,6 +7,7 @@ module.exports = {
   testEnvironment: "node",
   extensionsToTreatAsEsm: [".ts"],
   moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
     "^@domain/(.*)\\.js$": "<rootDir>/src/domain/$1.ts",
     "^@ports/(.*)\\.js$": "<rootDir>/src/application/ports/$1.ts",
     "^@dto/(.*)\\.js$": "<rootDir>/src/application/dto/$1.ts",
