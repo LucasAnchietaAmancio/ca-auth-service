@@ -15,18 +15,17 @@
         acessToken string
     }
 
-#### **SessionEntity**
+#### **CompanyEntity**
 
 ##### *Entrada*
-    cookieHeader - String
-    expiresAt - Number
-    acessToken - String 
+    companyName - String
+    email - String
+    password - String 
 
 ##### *Saída*
     SessionEntity {
         companyId: string,
         ompanyName: string,
         email: string,
-        password: string,
     }
 

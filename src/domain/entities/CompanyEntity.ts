@@ -4,7 +4,7 @@ import PasswordValueObject from "@domain/value-objects/PasswordValueObject.js";
 export default class CompanyEntity {
     private constructor(
         private readonly _companyId: string,
-        public readonly companyName: string,
+        public readonly _companyName: string,
         private  _email: EmailValueObject,
         private  _password: PasswordValueObject,
     ){}
@@ -23,6 +23,14 @@ export default class CompanyEntity {
 
     public get password(): string {
         return this._password.getValue();
+    }
+
+    public get companyName(): string {
+        return this._companyName;
+    }
+
+    public static restore(companyId: string, companyName: string, email: string, password: string): CompanyEntity {
+        return new CompanyEntity(companyId, companyName, EmailValueObject.restore(email), PasswordValueObject.restore(password));
     }
 
 }

@@ -20,4 +20,9 @@ export default class PasswordValueObject {
         if(!this.isValidPassword(password)) throw new InvalidPasswordException("Senha fornecida é inválida", "INVALID_PASSWORD", {});
         return new PasswordValueObject(password);
     }
+
+    public static restore(password: string): PasswordValueObject {
+        if(!password) throw new InvalidPasswordException("Senha fornecida é invalida para o processo de restauração de entidade", "INVALID_PASSWORD", {});
+        return new PasswordValueObject(password)
+    }
 }

@@ -16,7 +16,12 @@ export default class EmailValueObject {
     }
 
     public static create(email: string): EmailValueObject {
-        if(!this.isValidEmail(email)) throw new InvalidEmailException("Email fornecido é inválido", "INVALID_EMAIL", { email });
+        if(!this.isValidEmail(email)) throw new InvalidEmailException("E-mail fornecido é inválido", "INVALID_EMAIL", { email });
+        return new EmailValueObject(email);
+    }
+
+    public static restore(email: string): EmailValueObject {
+        if(!email) throw new InvalidEmailException("E-mail fornecido é invalida para o processo de restauração de entidade", "INVALID_EMAIL", { email });
         return new EmailValueObject(email);
     }
 }
