@@ -75,35 +75,108 @@
 
 ---
 
+### ***Melhoria futura - proteção de credenciais***
+
+As credenciais de empresas devem ser persistidas com criptografia reversível em repouso, pois são necessárias no login externo do Conta Azul. A implementação deverá ser introduzida por uma porta de saída, para que a aplicação dependa apenas de um contrato de criptografia e a infraestrutura concentre o acesso à chave e ao mecanismo criptográfico. Senhas, cookies e access tokens não devem ser registrados em logs, erros ou eventos.
+
+---
+
 ### ***7. Arvore de Arquivos***
 ```bash
 ├── .github/
 │   └── workflows/
-├── docs/
-│   ├── architecture-informations.md
-│   ├── diagrams/
-│   └── core/
-├── src/
-│   ├── application/
-│   │   │   ├── ports/
-│   │   │   │   ├── in/
-│   │   │   │   └── out/
-│   │   │   └── use-cases/
-│   │   ├── domain/
-│   │   │   ├── entities/
-│   │   │   ├── value-objects/
-│   │   │   └── errors/
-│   │   └── adapters/
-│   │       ├── db/    
-│   │       ├── scraper/      # Puppeteer (login)
-│   │       ├── totp/         # otplib
-│   │       ├── events/       # publisher RabbitMQ
-│   │       ├── lock/         # Redis
-│   │       ├── notifier/     # e-mail de alerta
-│   │       └── schedule/     # node-cron
-├── tests/
-├── docker-compose.yml
-├── .env.example
+├── docs
+│   └── v1
+│       ├── core
+│       │   ├── business-flows.md
+│       │   ├── domain.md
+│       │   └── use-cases.md
+│       ├── diagrams
+│       │   ├── architecture
+│       │   │   └── Explicit Hexagonal Architecture.png
+│       │   ├── auth-service-simple-flow.png
+│       │   └── database-diagram.png
+│       ├── architecture-informations.md
+│       └── implementing.md
+├── prisma
+│   ├── migrations
+│   │   ├── 20260904152252_initial_migration
+│   │   │   └── migration.sql
+│   │   └── migration_lock.toml
+│   └── schema.prisma
+├── src
+│   ├── application
+│   │   ├── dto
+│   │   │   ├── CreateCompanyDto.ts
+│   │   │   ├── GenerateSessionDto.ts
+│   │   │   └── PuppeteerAuthAdapterResponseDto.ts
+│   │   ├── ports
+│   │   │   └── in
+│   │   │       ├── CreateCompanyUseCasePort.ts
+│   │   │       └── GenerateSessionUseCasePort.ts
+│   │   └── use-cases
+│   │       ├── CreateCompanyUseCase.ts
+│   │       └── GenerateSessionUseCase.ts
+│   ├── domain
+│   │   ├── entities
+│   │   │   ├── CompanyEntity.ts
+│   │   │   └── SessionEntity.ts
+│   │   ├── exceptions
+│   │   │   ├── CompanyNotFoundError.ts
+│   │   │   ├── DatabaseException.ts
+│   │   │   ├── InvalidEmailException.ts
+│   │   │   ├── InvalidInputParams.ts
+│   │   │   ├── InvalidPasswordException.ts
+│   │   │   └── UserAlreadyExists.ts
+│   │   └── value-objects
+│   │       ├── EmailValueObject.ts
+│   │       └── PasswordValueObject.ts
+│   ├── infra
+│   │   └── in
+│   │   |    └── web
+│   │   |        ├── controllers
+│   │   |        │   └── CreateCompanyController.ts
+│   │   |        ├── middlewares
+│   │   |        │   └── GlobalErrorMiddleware.ts
+│   │   |        └── routes
+│   │   |           └── CompanyRoute.ts
+│   │   └── out
+│   │       └── adapters
+│   │           ├── database
+│   │               └── repositories
+|   |                   └── PostgresCompanyRepository.ts
+│   └── main
+│       ├── app
+│       │   └── App.ts
+│       ├── factories
+│       │   └── CreateCompanyControllerFactory.ts
+│       └── server.ts
+├── test
+│   ├── application
+│   │   └── use-cases
+│   │       ├── CreateCompanyUseCase.test.ts
+│   │       └── GenerateSessionUseCase.test.ts
+│   ├── domain
+│   │   ├── entities
+│   │   │   ├── CompanyEntity.test.ts
+│   │   │   └── SessionEntity.test.ts
+│   │   └── value-objects
+│   │       ├── EmailValueObject.test.ts
+│   │       └── PasswordValueObject.test.ts
+│   └── infra
+│       └── in
+│           └── web
+│               ├── controllers
+│               │   └── CreateCompanyController.test.ts
+│               └── middlewares
+│                   └── GlobalErrorMiddleware.test.ts
 ├── .gitignore
-└── README.md
+├── README.md
+├── docker-compose.yml
+├── jest.config.cjs
+├── package-lock.json
+├── package.json
+├── prisma.config.ts
+└── tsconfig.json
+```
 ```

@@ -4,15 +4,24 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.cjs"
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --config jest.config.cjs",
+    "dev": "tsx watch src/main/server.ts",
+    "start": "tsx src/main/server.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "jest": "^30.4.2",
+    "prisma": "^6.19.3",
     "ts-jest": "^29.4.12",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@prisma/client": "^7.10.0"
+    "@prisma/client": "^6.19.3",
+    "dotenv": "^16.6.1",
+    "express": "^5.2.1"
   }
 }

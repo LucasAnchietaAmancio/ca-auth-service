@@ -9,7 +9,7 @@
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
-    "types": ["jest"],
+    "types": ["node", "jest"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
@@ -44,7 +44,13 @@
       "@domain/*.js": ["./src/domain/*.ts"],
       "@ports/*.js": ["./src/application/ports/*.ts"],
       "@dto/*.js": ["./src/application/dto/*.ts"],
-      "@exceptions/*.js": ["./src/domain/exceptions/*.ts"]
+      "@exceptions/*.js": ["./src/domain/exceptions/*.ts"],
+      "@use-cases/*.js": ["./src/application/use-cases/*.ts"],
+      "@adapters/*.js": ["./src/infra/out/adapters/*.ts"],
+      "@controllers/*.js": ["./src/infra/in/web/controllers/*.ts"],
+      "@factories/*.js": ["./src/main/factories/*.ts"],
+      "@routes/*.js": ["./src/infra/in/web/routes/*.ts"],
+      "@middlewares/*.js": ["./src/infra/in/web/middlewares/*.ts"]
     }
   }
 }

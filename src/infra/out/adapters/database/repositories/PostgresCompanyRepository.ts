@@ -11,7 +11,7 @@ export default class PostgresCompanyRepository implements CompanyRepositoryPort 
     public async findById(companyId: string): Promise<CompanyEntity | null> {
 
         try {
-            const company = await this.db.company.findUnique({where: { id: companyId }}); 
+            const company = await this.db.company.findUnique({where: { companyId: companyId }}); 
             
             return company ? CompanyEntity.restore(
                 company.companyId,
@@ -36,7 +36,7 @@ export default class PostgresCompanyRepository implements CompanyRepositoryPort 
                 company.password,
             ): null;
         } catch(err) {
-            throw new DatabaseException("Ocorreu um erro ao realizar a busca por id", "DATABASE_EXCEPTION", {})
+            throw new DatabaseException("Ocorreu um erro ao realizar a busca por e-mail", "DATABASE_EXCEPTION", {})
         }
     }
 
@@ -45,13 +45,14 @@ export default class PostgresCompanyRepository implements CompanyRepositoryPort 
         try {
             await this.db.company.create({
                 data: {
-                    id: company.companyId,
+                    companyId: company.companyId,
                     companyName: company.companyName,
                     email: company.email,
                     password: company.password,
                 },
             });
         } catch(err) {
+            if(typeof err === "object" && err !== null && "code" in err && err.code === "P2002") throw new DatabaseException("Já existe uma empresa cadastrada com o e-mail fornecido", "DUPLICATE_EMAIL", {})
             throw new DatabaseException("Ocorreu um erro ao tentar salvar a empresa", "DATABASE_EXCEPTION", {})
         }
     }

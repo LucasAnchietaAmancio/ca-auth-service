@@ -22,7 +22,7 @@ export default class PasswordValueObject {
     }
 
     public static restore(password: string): PasswordValueObject {
-        if(!password) throw new InvalidPasswordException("Senha fornecida é invalida para o processo de restauração de entidade", "INVALID_PASSWORD", {});
+        if(!this.isValidPassword(password)) throw new InvalidPasswordException("Senha fornecida é invalida para o processo de restauração de entidade", "INVALID_PASSWORD", {});
         return new PasswordValueObject(password)
     }
 }
