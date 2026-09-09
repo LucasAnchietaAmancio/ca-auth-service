@@ -5,6 +5,7 @@ export default class PasswordValueObject {
     
     private constructor(
         private value: string,
+        private readonly encrypted: boolean,
     ){}
 
     public static isValidPassword(password: string): boolean {
@@ -16,13 +17,20 @@ export default class PasswordValueObject {
         return this.value;
     }
 
-    public static create(password: string): PasswordValueObject {
-        if(!this.isValidPassword(password)) throw new InvalidPasswordException("Senha fornecida é inválida", "INVALID_PASSWORD", {});
-        return new PasswordValueObject(password);
+    public isEncrypted(): boolean {
+        return this.encrypted;
     }
 
-    public static restore(password: string): PasswordValueObject {
-        if(!this.isValidPassword(password)) throw new InvalidPasswordException("Senha fornecida é invalida para o processo de restauração de entidade", "INVALID_PASSWORD", {});
-        return new PasswordValueObject(password)
+    public static create(password: string): PasswordValueObject {
+        if(!this.isValidPassword(password)) throw new InvalidPasswordException("Senha fornecida é inválida", "INVALID_PASSWORD", {});
+        return new PasswordValueObject(password, false);
+    }
+
+    public static restoreEncrypted(encryptedPassword: string): PasswordValueObject {
+        if (!encryptedPassword || encryptedPassword.trim().length === 0) {
+            throw new InvalidPasswordException("Senha criptografada inválida para o processo de restauração de entidade", "INVALID_ENCRYPTED_PASSWORD", {});
+        }
+
+        return new PasswordValueObject(encryptedPassword, true);
     }
 }

@@ -1,21 +1,14 @@
 import SessionEntity from "@domain/entities/SessionEntity.js";
 
 describe("SessionEntity",() => {
-    it("Deve criar uma instância de SessionEntity com os valores fornecidos", () => {
-        const sessionEntity =  SessionEntity.create(
-            "x-ca-auth",
-            7132164360,
-            "value-acess-token"
-        );
+    it("Deve criar uma instância de SessionEntity a partir do token interno", () => {
+        const sessionEntity = SessionEntity.create("value-access-token");
         expect(sessionEntity).toBeInstanceOf(SessionEntity);
+        expect(sessionEntity.accessToken).toBe("value-access-token");
     });
 
     it("Deve criar uma instância de SessionEntity com um sessionId gerado automaticamente", () => {
-        const sessionEntity =  SessionEntity.create(
-            "x-ca-auth",
-            7132164360,
-            "value-acess-token"
-        );
+        const sessionEntity = SessionEntity.create("value-access-token");
         expect(sessionEntity.sessionId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
     });
 });

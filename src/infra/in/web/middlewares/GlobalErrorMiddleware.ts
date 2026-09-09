@@ -5,10 +5,12 @@ import InvalidEmailException from "@exceptions/InvalidEmailException.js";
 import InvalidInputParams from "@exceptions/InvalidInputParams.js";
 import InvalidPasswordException from "@exceptions/InvalidPasswordException.js";
 import UserAlreadyExists from "@exceptions/UserAlreadyExists.js";
+import InvalidTotpException from "@exceptions/InvalidTotpException.js";
+import ExternalAuthenticationException from "@exceptions/ExternalAuthenticationException.js";
 
 export default class GlobalErrorMiddleware {
-    public static handle(error: unknown,_request: Request,response: Response,_next: NextFunction): void {
-        if (error instanceof InvalidInputParams ||error instanceof InvalidEmailException ||error instanceof InvalidPasswordException) {
+    public static handle(error: unknown, request: Request,response: Response, next: NextFunction): void {
+        if (error instanceof InvalidInputParams ||error instanceof InvalidEmailException ||error instanceof InvalidPasswordException || error instanceof InvalidTotpException) {
             this.send(response, 400, error.tag, error.message);
             return;
         }
@@ -20,6 +22,12 @@ export default class GlobalErrorMiddleware {
 
         if (error instanceof CompanyNotFoundError) {
             this.send(response, 404, error.tag, error.message);
+            return;
+        }
+
+        if (error instanceof ExternalAuthenticationException) {
+            const statusCode = error.tag === "INVALID_EXTERNAL_CREDENTIALS" ? 401 : 502;
+            this.send(response, statusCode, error.tag, error.message);
             return;
         }
 

@@ -1,5 +1,6 @@
-import EmailValueObject from "@domain/value-objects/EmailValueObject.js";
-import PasswordValueObject from "@domain/value-objects/PasswordValueObject.js";
+import EmailValueObject from "@value-objects/EmailValueObject.js";
+import PasswordValueObject from "@value-objects/PasswordValueObject.js";
+import TotpSecretValueObject from "@value-objects/TotpSecretValueObject.js";
 
 export default class CompanyEntity {
     private constructor(
@@ -7,10 +8,11 @@ export default class CompanyEntity {
         public readonly _companyName: string,
         private  _email: EmailValueObject,
         private  _password: PasswordValueObject,
+        private _totpSecret: TotpSecretValueObject
     ){}
 
-    public static create(companyName: string, email: string, password: string): CompanyEntity {
-        return new CompanyEntity(crypto.randomUUID(), companyName, EmailValueObject.create(email), PasswordValueObject.create(password));
+    public static create(companyName: string, email: string, password: string, totpSecret: string): CompanyEntity {
+        return new CompanyEntity(crypto.randomUUID(), companyName, EmailValueObject.create(email), PasswordValueObject.create(password), TotpSecretValueObject.create(totpSecret));
     }
 
     public get companyId(): string {
@@ -29,8 +31,20 @@ export default class CompanyEntity {
         return this._companyName;
     }
 
-    public static restore(companyId: string, companyName: string, email: string, password: string): CompanyEntity {
-        return new CompanyEntity(companyId, companyName, EmailValueObject.restore(email), PasswordValueObject.restore(password));
+    public get totpSecret(): string {
+        return this._totpSecret.getValue();
+    }
+
+    public updatePassword(encryptedPassword: string): void {
+        this._password = PasswordValueObject.restoreEncrypted(encryptedPassword);
+    }
+
+    public updateTotpSecret(encryptedTotpSecret: string): void {
+        this._totpSecret = TotpSecretValueObject.restoreEncrypted(encryptedTotpSecret);
+    }
+
+    public static restore(companyId: string, companyName: string, email: string, encryptedPassword: string, encryptedTotpSecret: string): CompanyEntity {
+        return new CompanyEntity(companyId, companyName, EmailValueObject.restore(email), PasswordValueObject.restoreEncrypted(encryptedPassword), TotpSecretValueObject.restoreEncrypted(encryptedTotpSecret));
     }
 
 }

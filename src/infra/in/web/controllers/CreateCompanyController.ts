@@ -1,6 +1,6 @@
 import type CreateCompanyUseCasePort from "@ports/in/CreateCompanyUseCasePort.js";
 import type { Request, Response, NextFunction } from "express";
-import InvalidInputParams from "@domain/exceptions/InvalidInputParams.js";
+import InvalidInputParams from "@exceptions/InvalidInputParams.js";
 
 export default class CreateCompanyController {
     public constructor(
@@ -9,9 +9,9 @@ export default class CreateCompanyController {
 
     public async execute(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const {companyName, email, password} = req.body ?? {};
+            const {companyName, email, password, totpSecret} = req.body ?? {};
     
-            if (typeof companyName !== "string" || !companyName.trim()|| typeof email !== "string" || !email.trim()|| typeof password !== "string" || !password.trim()) {
+            if (typeof companyName !== "string" || !companyName.trim()|| typeof email !== "string" || !email.trim()|| typeof password !== "string" || !password.trim() || typeof totpSecret !== "string" || !totpSecret.trim()) {
                 throw new InvalidInputParams("Dados obrigatórios para a requisição não enviados", "INVALID_INPUT");
             }
 
@@ -19,6 +19,7 @@ export default class CreateCompanyController {
                 companyName: companyName.trim(),
                 email: email.trim(),
                 password,
+                totpSecret: totpSecret.trim()
             });
 
             res.status(201).json({ 

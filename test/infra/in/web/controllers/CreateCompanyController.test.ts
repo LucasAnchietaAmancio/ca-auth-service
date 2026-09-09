@@ -17,6 +17,7 @@ describe("CreateCompanyController", () => {
                 companyName: "  Empresa Teste  ",
                 email: "  Email@Teste.Com  ",
                 password: " password!@123A ",
+                totpSecret: "  JBSWY3DPEBLW64TMMQQQ  ",
             },
         } as Request;
         const response = { status } as unknown as Response;
@@ -28,6 +29,7 @@ describe("CreateCompanyController", () => {
             companyName: "Empresa Teste",
             email: "Email@Teste.Com",
             password: " password!@123A ",
+            totpSecret: "JBSWY3DPEBLW64TMMQQQ",
         });
         expect(status).toHaveBeenCalledWith(201);
         expect(json).toHaveBeenCalledWith({
@@ -42,7 +44,7 @@ describe("CreateCompanyController", () => {
         };
         const controller = new CreateCompanyController(createCompanyUseCase);
         const request = {
-            body: { companyName: "Empresa Teste", email: [], password: "password!@123A" },
+            body: { companyName: "Empresa Teste", email: [], password: "password!@123A", totpSecret: "JBSWY3DPEBLW64TMMQQQ" },
         } as Request;
         const response = {} as Response;
         const next = jest.fn() as NextFunction;

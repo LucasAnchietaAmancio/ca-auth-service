@@ -1,51 +1,61 @@
-### ***1. Visão Geral do Sistema***
-*O sistema consiste no serviço de autenticação de um ecossistema de microsserviços distribuídos em formato, projetado para automatizar a o processo de login e captura de credenciais do ERP Conta azul.
+# Arquitetura e requisitos
 
----
+## Visão geral
 
-### ***2. Objetivo do Sistema***
-*Automatizar a obtenção de sessões autenticadas do ERP Conta Azul de forma resiliente, escalável e totalmente automatizada, permitindo que os dados estejam sempre atualizados sem ou com intervenção humana.*
+O `auth-service` é um serviço em TypeScript para cadastrar empresas e, na versão planejada, autenticar cada empresa no ERP Conta Azul. A autenticação será automatizada por navegador headless porque o fluxo externo exige MFA/TOTP.
 
----
+## Estado da versão atual
 
-### ***3. Escopo***
-*Responsável pela autenticação junto ao ERP Conta Azul e envio de sessão para o inventory-service*
+A implementação disponível nesta branch entrega a base multiempresa:
 
----
+- aplicação organizada em arquitetura hexagonal;
+- cadastro HTTP de empresas;
+- validação de e-mail e senha no domínio;
+- persistência PostgreSQL via Prisma;
+- busca de empresa por `companyId`;
+- proteção reversível de senha e segredo TOTP em repouso;
+- geração de TOTP;
+- login externo via adapter Puppeteer e criação de uma `SessionEntity` em memória.
 
-### ***4. Requisitos Funcionais***
+O adapter Conta Azul implementa seu método `execute`, mas seus seletores e o fluxo real ainda devem ser validados com uma conta de homologação. Não há sessão persistida nem publicação de eventos.
 
-*RF001 - Realizar autenticação utilizando usuário e senha.*
+## Escopo planejado
 
-*RF002 - Gerar o código TOTP.*
+- autenticar uma empresa no Conta Azul;
+- capturar cookies e access token;
+- persistir a sessão por empresa;
+- publicar a sessão para consumidores, como `inventory-service`;
+- renovar a sessão antes da expiração;
+- impedir autenticações concorrentes por empresa;
+- notificar falhas sem retry automático.
 
-*RF003 - Validar o segundo fator.*
+## Requisitos e status
 
-*RF004 - Capturar cookies da sessão.*
+| ID | Requisito | Status |
+|---|---|---|
+| RF001 | Autenticar com usuário e senha | Implementado; requer validação integrada |
+| RF002 | Gerar TOTP | Implementado |
+| RF003 | Validar segundo fator | Implementado; requer validação integrada |
+| RF004 | Capturar access token | Implementado; requer validação integrada |
+| RF005 | Publicar evento de autenticação | Não implementado |
+| RF006 | Renovar sessão antes da expiração | Não implementado |
+| RF007 | Lock distribuído por empresa | Não implementado |
+| RF008 | Notificar falhas sem retry automático | Não implementado |
+| RF009 | Persistir credenciais por empresa | Implementado com criptografia reversível; gestão de chaves ainda precisa ser endurecida |
 
-*RF005 - Publicar um evento contendo os dados necessários para autenticação dos demais serviços.*
+## Persistência atual
 
-*RF006 - Renovar automaticamente a sessão 1 dia antes da expiração*
+A tabela `Company` possui `companyId`, `companyName`, `email`, `password` e `totpSecret`. Senha e segredo TOTP são cifrados antes da persistência. A chave permanece fora do banco, mas rotação e gestão segura de chaves ainda são pendências para produção.
 
-*RF007 - Adquirir e liberar um lock distribuído durante a execução do login, impedindo autenticações concorrentes.*
+Ainda não existem tabelas de sessão, lock ou histórico de autenticação.
 
-*RF008 - Enviar notificações de falha de autenticação, sem retry automático.*
+## Evento planejado
 
-*RF009 - Persistir credenciais da empresa*
+O evento `SessionAuthenticated` ainda não é publicado. Quando implementado, deverá incluir pelo menos:
 
-
----
-
-### **5. Catalogo de eventos**
-
-### ***Evento 1*** - Autenticação
-### **Publicador:**
-    auth-service
-### **Consumidor:**
-    inventory-service
-### **Payload:**
 ```json
 {
+  "companyId": "uuid",
   "sessionId": "uuid",
   "cookieHeader": "string",
   "accessToken": "string",
@@ -53,130 +63,16 @@
   "expiresAt": "2026-08-12T10:00:00.000Z"
 }
 ```
-*Obs: o inventory-service valida este schema em runtime, já que não há pacote de contrato compartilhado.*
 
----
+Cookies, tokens, senhas e segredos TOTP não devem aparecer em logs ou alertas.
 
-### ***6. Tecnologias***
+## Tecnologias presentes e planejadas
 
-| Categoria | Tecnologia |
+| Categoria | Estado |
 |---|---|
-| Linguagem | Node.js, TypeScript |
-| Mensageria | RabbitMQ, amqplib |
-| Agendamento | node-cron |
-| Automação de navegador | Puppeteer |
-| Autenticação (2FA) | otplib (TOTP) |
-| Validação de schema | Zod |
-| Lock distribuído | Redis |
-| Notificação de falhas | Nodemailer (SMTP) |
-| Observabilidade | Pino (logs estruturados) + Grafana Loki |
-| Testes | Jest |
-| Containerização | Docker, Docker Compose |
-
----
-
-### ***Melhoria futura - proteção de credenciais***
-
-As credenciais de empresas devem ser persistidas com criptografia reversível em repouso, pois são necessárias no login externo do Conta Azul. A implementação deverá ser introduzida por uma porta de saída, para que a aplicação dependa apenas de um contrato de criptografia e a infraestrutura concentre o acesso à chave e ao mecanismo criptográfico. Senhas, cookies e access tokens não devem ser registrados em logs, erros ou eventos.
-
----
-
-### ***7. Arvore de Arquivos***
-```bash
-├── .github/
-│   └── workflows/
-├── docs
-│   └── v1
-│       ├── core
-│       │   ├── business-flows.md
-│       │   ├── domain.md
-│       │   └── use-cases.md
-│       ├── diagrams
-│       │   ├── architecture
-│       │   │   └── Explicit Hexagonal Architecture.png
-│       │   ├── auth-service-simple-flow.png
-│       │   └── database-diagram.png
-│       ├── architecture-informations.md
-│       └── implementing.md
-├── prisma
-│   ├── migrations
-│   │   ├── 20260904152252_initial_migration
-│   │   │   └── migration.sql
-│   │   └── migration_lock.toml
-│   └── schema.prisma
-├── src
-│   ├── application
-│   │   ├── dto
-│   │   │   ├── CreateCompanyDto.ts
-│   │   │   ├── GenerateSessionDto.ts
-│   │   │   └── PuppeteerAuthAdapterResponseDto.ts
-│   │   ├── ports
-│   │   │   └── in
-│   │   │       ├── CreateCompanyUseCasePort.ts
-│   │   │       └── GenerateSessionUseCasePort.ts
-│   │   └── use-cases
-│   │       ├── CreateCompanyUseCase.ts
-│   │       └── GenerateSessionUseCase.ts
-│   ├── domain
-│   │   ├── entities
-│   │   │   ├── CompanyEntity.ts
-│   │   │   └── SessionEntity.ts
-│   │   ├── exceptions
-│   │   │   ├── CompanyNotFoundError.ts
-│   │   │   ├── DatabaseException.ts
-│   │   │   ├── InvalidEmailException.ts
-│   │   │   ├── InvalidInputParams.ts
-│   │   │   ├── InvalidPasswordException.ts
-│   │   │   └── UserAlreadyExists.ts
-│   │   └── value-objects
-│   │       ├── EmailValueObject.ts
-│   │       └── PasswordValueObject.ts
-│   ├── infra
-│   │   └── in
-│   │   |    └── web
-│   │   |        ├── controllers
-│   │   |        │   └── CreateCompanyController.ts
-│   │   |        ├── middlewares
-│   │   |        │   └── GlobalErrorMiddleware.ts
-│   │   |        └── routes
-│   │   |           └── CompanyRoute.ts
-│   │   └── out
-│   │       └── adapters
-│   │           ├── database
-│   │               └── repositories
-|   |                   └── PostgresCompanyRepository.ts
-│   └── main
-│       ├── app
-│       │   └── App.ts
-│       ├── factories
-│       │   └── CreateCompanyControllerFactory.ts
-│       └── server.ts
-├── test
-│   ├── application
-│   │   └── use-cases
-│   │       ├── CreateCompanyUseCase.test.ts
-│   │       └── GenerateSessionUseCase.test.ts
-│   ├── domain
-│   │   ├── entities
-│   │   │   ├── CompanyEntity.test.ts
-│   │   │   └── SessionEntity.test.ts
-│   │   └── value-objects
-│   │       ├── EmailValueObject.test.ts
-│   │       └── PasswordValueObject.test.ts
-│   └── infra
-│       └── in
-│           └── web
-│               ├── controllers
-│               │   └── CreateCompanyController.test.ts
-│               └── middlewares
-│                   └── GlobalErrorMiddleware.test.ts
-├── .gitignore
-├── README.md
-├── docker-compose.yml
-├── jest.config.cjs
-├── package-lock.json
-├── package.json
-├── prisma.config.ts
-└── tsconfig.json
-```
-```
+| Node.js e TypeScript | Presente |
+| Express | Presente |
+| PostgreSQL e Prisma | Presente |
+| Jest | Presente |
+| Puppeteer e TOTP | Presentes; fluxo externo requer validação integrada |
+| RabbitMQ, Redis e SMTP | Planejados |

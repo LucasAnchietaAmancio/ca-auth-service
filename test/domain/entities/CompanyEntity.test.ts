@@ -1,4 +1,4 @@
-import CompanyEntity from "@domain/entities/CompanyEntity.js";
+import CompanyEntity from "@entities/CompanyEntity.js";
 import InvalidEmailException from "@exceptions/InvalidEmailException.js";
 import InvalidPasswordException from "@exceptions/InvalidPasswordException.js";
 
@@ -7,7 +7,8 @@ describe("CompanyEntity", () => {
         const companyEntity = CompanyEntity.create(
             "Empresa Teste",
             "email@teste.com",
-            "hashed!@Password123"
+            "hashed!@Password123",
+            "JBSWY3DPEBLW64TMMQQQ"
         );
         expect(companyEntity).toBeInstanceOf(CompanyEntity);
     });
@@ -16,7 +17,8 @@ describe("CompanyEntity", () => {
         expect(() => CompanyEntity.create(
             "Empresa Teste",
             "emailteste.com",
-            "hashed!@Password123"
+            "hashed!@Password123",
+            "JBSWY3DPEBLW64TMMQQQ"
         )).toThrow(InvalidEmailException);
     });
 
@@ -24,7 +26,34 @@ describe("CompanyEntity", () => {
         expect(() => CompanyEntity.create(
             "Empresa Teste",
             "email@teste.com",
-            "qw23123La"
+            "qw23123La",
+            "JBSWY3DPEBLW64TMMQQQ"
         )).toThrow(InvalidPasswordException);
+    });
+
+    it("Deve permitir substituir a senha em texto por sua representação criptografada", () => {
+        const companyEntity = CompanyEntity.create(
+            "Empresa Teste",
+            "email@teste.com",
+            "hashed!@Password123",
+            "JBSWY3DPEBLW64TMMQQQ"
+        );
+
+        companyEntity.updatePassword("encrypted_password");
+
+        expect(companyEntity.password).toBe("encrypted_password");
+    });
+
+    it("Deve atualizar o segredo TOTP para o valor criptografado", () => {
+        const companyEntity = CompanyEntity.create(
+            "Empresa Teste",
+            "email@teste.com",
+            "hashed!@Password123",
+            "JBSWY3DPEBLW64TMMQQQ"
+        );
+
+        companyEntity.updateTotpSecret("encrypted_totp_secret");
+
+        expect(companyEntity.totpSecret).toBe("encrypted_totp_secret");
     });
 })

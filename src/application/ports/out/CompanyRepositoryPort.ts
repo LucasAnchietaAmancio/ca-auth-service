@@ -1,4 +1,4 @@
-import CompanyEntity from "@domain/entities/CompanyEntity.js";
+import CompanyEntity from "@entities/CompanyEntity.js";
 
 export default interface CompanyRepositoryPort {
     findById(companyId: string): Promise<CompanyEntity | null>;

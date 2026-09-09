@@ -4,9 +4,13 @@ CREATE TABLE "Company" (
     "companyName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "totpSecret" TEXT NOT NULL,
 
     CONSTRAINT "Company_pkey" PRIMARY KEY ("companyId")
 );
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Company_email_key" ON "Company"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Company_totpSecret_key" ON "Company"("totpSecret");

@@ -41,7 +41,9 @@
     "moduleDetection": "force",
     "skipLibCheck": true,
     "paths": {
+      "@entities/*.js": ["./src/domain/entities/*.ts"],
       "@domain/*.js": ["./src/domain/*.ts"],
+      "@value-objects/*.js": ["./src/domain/value-objects/*.ts"],
       "@ports/*.js": ["./src/application/ports/*.ts"],
       "@dto/*.js": ["./src/application/dto/*.ts"],
       "@exceptions/*.js": ["./src/domain/exceptions/*.ts"],

@@ -1,9 +1,10 @@
 import { jest } from "@jest/globals";
 import GenerateSessionUseCase from "../../../src/application/use-cases/GenerateSessionUseCase.js";
-import CompanyEntity from "@domain/entities/CompanyEntity.js";
+import CompanyEntity from "@entities/CompanyEntity.js";
 import CompanyNotFoundError from "@exceptions/CompanyNotFoundError.js";
 import type CompanyRepositoryPort from "@ports/out/CompanyRepositoryPort.js";
 import type ContaAzulPuppeteerAuthAdapterPort from "@ports/out/ContaAzulPuppeteerAuthAdapterPort.js";
+import type CryptoHashAdapterPort from "@ports/out/CryptoHashAdapterPort.js";
 
 describe("GenerateSessionUseCase", () => {
     it("Deve retornar um erro caso a empresa não exista", async () => {
@@ -15,9 +16,14 @@ describe("GenerateSessionUseCase", () => {
             findByEmail: jest.fn<CompanyRepositoryPort["findByEmail"]>(),
             save: jest.fn<CompanyRepositoryPort["save"]>(),
         };
+        const cryptoAdapter: jest.Mocked<CryptoHashAdapterPort> = {
+            encrypt: jest.fn<CryptoHashAdapterPort["encrypt"]>(),
+            decrypt: jest.fn<CryptoHashAdapterPort["decrypt"]>(),
+        };
         const generateSessionUseCase = new GenerateSessionUseCase(
             contaAzulPuppeteerAuthAdapter,
             companyRepository,
+            cryptoAdapter,
         );
 
         await expect(generateSessionUseCase.execute({ companyId: "company-id" }))
@@ -25,15 +31,15 @@ describe("GenerateSessionUseCase", () => {
     });
 
     it("Deve gerar uma sessão para uma empresa existente", async () => {
-        const company = CompanyEntity.create(
+        const company = CompanyEntity.restore(
+            "company-id",
             "Empresa Teste",
             "email@teste.com",
-            "hashed!@Password123",
+            "encrypted_password",
+            "encrypted_totp_secret",
         );
         const contaAzulPuppeteerAuthAdapter: jest.Mocked<ContaAzulPuppeteerAuthAdapterPort> = {
             execute: jest.fn<ContaAzulPuppeteerAuthAdapterPort["execute"]>().mockResolvedValue({
-                cookieHeader: "x-ca-auth",
-                expiresAt: 7132164360,
                 accessToken: "access-token",
             }),
         };
@@ -42,9 +48,16 @@ describe("GenerateSessionUseCase", () => {
             findByEmail: jest.fn<CompanyRepositoryPort["findByEmail"]>(),
             save: jest.fn<CompanyRepositoryPort["save"]>(),
         };
+        const cryptoAdapter: jest.Mocked<CryptoHashAdapterPort> = {
+            encrypt: jest.fn<CryptoHashAdapterPort["encrypt"]>(),
+            decrypt: jest.fn<CryptoHashAdapterPort["decrypt"]>()
+                .mockReturnValueOnce("hashed!@Password123")
+                .mockReturnValueOnce("JBSWY3DPEBLW64TMMQQQ"),
+        };
         const generateSessionUseCase = new GenerateSessionUseCase(
             contaAzulPuppeteerAuthAdapter,
             companyRepository,
+            cryptoAdapter,
         );
 
         const session = await generateSessionUseCase.execute({ companyId: company.companyId });
@@ -52,7 +65,8 @@ describe("GenerateSessionUseCase", () => {
         expect(session).toBeDefined();
         expect(contaAzulPuppeteerAuthAdapter.execute).toHaveBeenCalledWith(
             company.email,
-            company.password,
+            "hashed!@Password123",
+            "JBSWY3DPEBLW64TMMQQQ",
         );
     });
 });
