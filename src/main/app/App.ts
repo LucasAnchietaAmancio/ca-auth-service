@@ -4,6 +4,7 @@ import CompanyRoute from "@routes/CompanyRoute.js";
 import GlobalErrorMiddleware from "@middlewares/GlobalErrorMiddleware.js";
 import type Envs from "@config/Envs.js";
 import type { RedisClientType } from "redis";
+import AuthenticationMiddlewareFactory from "@factories/AuthenticationMiddlewareFactory.js";
 
 export default class App {
     private readonly app: Express;
@@ -13,6 +14,8 @@ export default class App {
         this.app.use(express.json());
 
         const companyRoute = new CompanyRoute(db, envs, redisClient);
+        const authenticationMiddleware = AuthenticationMiddlewareFactory.create(envs);
+        this.app.use("/v1", authenticationMiddleware.execute.bind(authenticationMiddleware));
         this.app.use("/v1", companyRoute.registerRoutes());
         this.app.use(GlobalErrorMiddleware.handle.bind(GlobalErrorMiddleware));
     }

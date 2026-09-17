@@ -29,8 +29,15 @@ POSTGRES_USER="postgres"
 POSTGRES_PASSWORD="senha"
 POSTGRES_DB="auth_service"
 REDIS_URL="redis://localhost:6379"
+RATE_LIMIT_SESSION_REQUEST_POINTS="30"
+RATE_LIMIT_SESSION_REQUEST_DURATION_SECONDS="60"
+RATE_LIMIT_SESSION_REQUEST_BLOCK_DURATION_SECONDS="60"
+RATE_LIMIT_EXTERNAL_AUTH_POINTS="1"
+RATE_LIMIT_EXTERNAL_AUTH_DURATION_SECONDS="120"
+RATE_LIMIT_EXTERNAL_AUTH_BLOCK_DURATION_SECONDS="300"
 PORT="3000"
 SECRET_KEY="uma-chave-longa-e-aleatoria"
+API_ACCESS_TOKEN="um-token-longo-e-aleatorio-para-chamadas-internas"
 ```
 
 Suba PostgreSQL e Redis, gere o Prisma, aplique migrations e inicie a API:
@@ -44,6 +51,16 @@ npm run dev
 ```
 
 O processo só abre a porta HTTP depois de conectar ao Redis. Falha de conexão encerra o bootstrap com `CACHE_CONNECTION_FAILED`.
+
+Todas as rotas sob `/v1` exigem o header abaixo. O valor real fica somente em `API_ACCESS_TOKEN` no `.env`.
+
+```http
+Authorization: Bearer <API_ACCESS_TOKEN>
+```
+
+Token ausente ou inválido retorna `401` com o código `INVALID_ACCESS_TOKEN`.
+
+O rate limit usa o mesmo Redis. A rota de sessão limita requisições por IP; após um cache miss, o login Puppeteer também é limitado por empresa. Os valores acima permitem 30 requisições por IP a cada 60 segundos e um novo login externo por empresa a cada 120 segundos, bloqueando por 300 segundos após excesso.
 
 ## API atual
 

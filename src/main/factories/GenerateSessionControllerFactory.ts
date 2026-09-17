@@ -6,6 +6,7 @@ import CryptoHashAdapter from "@adapters/hash/CryptoEncryptAdapter.js";
 import OtplibTotpAdapter from "@adapters/auth/OtplibTotpAdapter.js";
 import PuppeteerContaAzulAuthAdapter from "@adapters/auth/PuppeteerContaAzulAuthAdapter.js";
 import RedisSessionCacheAdapter from "@adapters/cache/RedisSessionCacheAdapter.js";
+import RedisRateLimiterAdapter from "@adapters/rate-limit/RedisRateLimiterAdapter.js";
 import type Envs from "@config/Envs.js";
 import type { RedisClientType } from "redis";
 
@@ -16,7 +17,8 @@ export default class GenerateSessionControllerFactory {
         const totpAdapter = new OtplibTotpAdapter();
         const contaAzulAdapter = new PuppeteerContaAzulAuthAdapter(totpAdapter, envs.contaAzul);
         const sessionCacheAdapter = new RedisSessionCacheAdapter(redisClient);
-        const useCase = new GenerateSessionUseCase(contaAzulAdapter, companyRepository, cryptoAdapter, sessionCacheAdapter);
+        const externalAuthenticationRateLimiter = new RedisRateLimiterAdapter(redisClient, envs.rateLimit.externalAuthentication);
+        const useCase = new GenerateSessionUseCase(contaAzulAdapter, companyRepository, cryptoAdapter, sessionCacheAdapter, externalAuthenticationRateLimiter);
 
         return new GenerateSessionController(useCase);
     }

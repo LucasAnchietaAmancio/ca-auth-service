@@ -8,6 +8,8 @@ import UserAlreadyExists from "@exceptions/UserAlreadyExists.js";
 import InvalidTotpException from "@exceptions/InvalidTotpException.js";
 import ExternalAuthenticationException from "@exceptions/ExternalAuthenticationException.js";
 import CacheException from "@exceptions/CacheException.js";
+import RateLimitException from "@exceptions/RateLimitException.js";
+import AuthenticationException from "@exceptions/AuthenticationException.js";
 
 export default class GlobalErrorMiddleware {
     public static handle(error: unknown, request: Request,response: Response, next: NextFunction): void {
@@ -26,6 +28,11 @@ export default class GlobalErrorMiddleware {
             return;
         }
 
+        if (error instanceof AuthenticationException) {
+            this.send(response, 401, error.tag, error.message);
+            return;
+        }
+
         if (error instanceof ExternalAuthenticationException) {
             const statusCode = error.tag === "INVALID_EXTERNAL_CREDENTIALS" ? 401 : 502;
             this.send(response, statusCode, error.tag, error.message);
@@ -40,6 +47,11 @@ export default class GlobalErrorMiddleware {
 
         if (error instanceof CacheException) {
             this.send(response, 503, error.tag, error.message);
+            return;
+        }
+
+        if (error instanceof RateLimitException) {
+            this.send(response, 429, error.tag, error.message);
             return;
         }
 

@@ -27,6 +27,7 @@
     "express": "^5.2.1",
     "otplib": "^13.5.0",
     "puppeteer": "^24.43.1",
+    "rate-limiter-flexible": "^11.2.0",
     "redis": "^6.2.1"
   }
 }

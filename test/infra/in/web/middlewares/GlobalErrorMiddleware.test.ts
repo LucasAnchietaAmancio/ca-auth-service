@@ -6,6 +6,8 @@ import CompanyNotFoundError from "@exceptions/CompanyNotFoundError.js";
 import DatabaseException from "@exceptions/DatabaseException.js";
 import InvalidInputParams from "@exceptions/InvalidInputParams.js";
 import CacheException from "@exceptions/CacheException.js";
+import RateLimitException from "@exceptions/RateLimitException.js";
+import AuthenticationException from "@exceptions/AuthenticationException.js";
 
 describe("GlobalErrorMiddleware", () => {
     it("Deve converter um erro de entrada inválida em HTTP 400", () => {
@@ -65,6 +67,40 @@ describe("GlobalErrorMiddleware", () => {
         expect(response.json).toHaveBeenCalledWith({
             success: false,
             error: { code: "CACHE_CONNECTION_FAILED", message: "Redis indisponível" },
+        });
+    });
+
+    it("Deve converter excesso de requisições em HTTP 429", () => {
+        const response = createResponse();
+
+        GlobalErrorMiddleware.handle(
+            new RateLimitException("Limite excedido", "RATE_LIMIT_EXCEEDED", {}),
+            {} as Request,
+            response as unknown as Response,
+            jest.fn() as NextFunction,
+        );
+
+        expect(response.status).toHaveBeenCalledWith(429);
+        expect(response.json).toHaveBeenCalledWith({
+            success: false,
+            error: { code: "RATE_LIMIT_EXCEEDED", message: "Limite excedido" },
+        });
+    });
+
+    it("Deve converter token inválido em HTTP 401", () => {
+        const response = createResponse();
+
+        GlobalErrorMiddleware.handle(
+            new AuthenticationException("Token inválido", "INVALID_ACCESS_TOKEN", {}),
+            {} as Request,
+            response as unknown as Response,
+            jest.fn() as NextFunction,
+        );
+
+        expect(response.status).toHaveBeenCalledWith(401);
+        expect(response.json).toHaveBeenCalledWith({
+            success: false,
+            error: { code: "INVALID_ACCESS_TOKEN", message: "Token inválido" },
         });
     });
 

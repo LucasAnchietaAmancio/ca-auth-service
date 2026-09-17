@@ -1,4 +1,5 @@
 import EnvironmentError from "@config/errors/EnvironmentError.js";
+import type RateLimitConfigDto from "@dto/RateLimitConfigDto.js";
 
 interface ParseOptions {
     key: string;
@@ -23,7 +24,12 @@ export interface ContaAzulLoginConfig {
 export default class Envs {
     public readonly database: { postgres: { uri: string } };
     public readonly cache: { redis: { url: string } };
+    public readonly rateLimit: {
+        sessionRequest: RateLimitConfigDto;
+        externalAuthentication: RateLimitConfigDto;
+    };
     public readonly crypto: { secretKey: string };
+    public readonly authentication: { accessToken: string };
     public readonly server: { port: number };
     public readonly contaAzul: ContaAzulLoginConfig;
 
@@ -34,8 +40,25 @@ export default class Envs {
         this.cache = {
             redis: { url: this.redisUrl({ key: "REDIS_URL", value: env.REDIS_URL }) },
         };
+        this.rateLimit = {
+            sessionRequest: {
+                keyPrefix: "auth-service:session-request",
+                points: this.positiveNumber({ key: "RATE_LIMIT_SESSION_REQUEST_POINTS", value: env.RATE_LIMIT_SESSION_REQUEST_POINTS }),
+                durationInSeconds: this.positiveNumber({ key: "RATE_LIMIT_SESSION_REQUEST_DURATION_SECONDS", value: env.RATE_LIMIT_SESSION_REQUEST_DURATION_SECONDS }),
+                blockDurationInSeconds: this.positiveNumber({ key: "RATE_LIMIT_SESSION_REQUEST_BLOCK_DURATION_SECONDS", value: env.RATE_LIMIT_SESSION_REQUEST_BLOCK_DURATION_SECONDS }),
+            },
+            externalAuthentication: {
+                keyPrefix: "auth-service:external-authentication",
+                points: this.positiveNumber({ key: "RATE_LIMIT_EXTERNAL_AUTH_POINTS", value: env.RATE_LIMIT_EXTERNAL_AUTH_POINTS }),
+                durationInSeconds: this.positiveNumber({ key: "RATE_LIMIT_EXTERNAL_AUTH_DURATION_SECONDS", value: env.RATE_LIMIT_EXTERNAL_AUTH_DURATION_SECONDS }),
+                blockDurationInSeconds: this.positiveNumber({ key: "RATE_LIMIT_EXTERNAL_AUTH_BLOCK_DURATION_SECONDS", value: env.RATE_LIMIT_EXTERNAL_AUTH_BLOCK_DURATION_SECONDS }),
+            },
+        };
         this.crypto = {
             secretKey: this.requiredString({ key: "SECRET_KEY", value: env.SECRET_KEY }),
+        };
+        this.authentication = {
+            accessToken: this.requiredString({ key: "API_ACCESS_TOKEN", value: env.API_ACCESS_TOKEN }),
         };
         this.server = {
             port: this.positiveNumber({ key: "PORT", value: env.PORT }),

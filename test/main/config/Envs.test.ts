@@ -4,7 +4,14 @@ import EnvironmentError from "@config/errors/EnvironmentError.js";
 const validEnv: NodeJS.ProcessEnv = {
     DATABASE_URL: "postgresql://user:password@localhost:5432/auth_service",
     SECRET_KEY: "a-secret-key",
+    API_ACCESS_TOKEN: "a-long-access-token",
     REDIS_URL: "redis://localhost:6379",
+    RATE_LIMIT_SESSION_REQUEST_POINTS: "30",
+    RATE_LIMIT_SESSION_REQUEST_DURATION_SECONDS: "60",
+    RATE_LIMIT_SESSION_REQUEST_BLOCK_DURATION_SECONDS: "60",
+    RATE_LIMIT_EXTERNAL_AUTH_POINTS: "1",
+    RATE_LIMIT_EXTERNAL_AUTH_DURATION_SECONDS: "120",
+    RATE_LIMIT_EXTERNAL_AUTH_BLOCK_DURATION_SECONDS: "300",
     PORT: "3000",
     CONTA_AZUL_LOGIN_URL: "https://login.example.com",
     CONTA_AZUL_EMAIL_SELECTOR: 'input[type="email"]',
@@ -26,7 +33,10 @@ describe("Envs", () => {
 
         expect(envs.server.port).toBe(3000);
         expect(envs.crypto.secretKey).toBe("a-secret-key");
+        expect(envs.authentication.accessToken).toBe("a-long-access-token");
         expect(envs.cache.redis.url).toBe("redis://localhost:6379");
+        expect(envs.rateLimit.sessionRequest.points).toBe(30);
+        expect(envs.rateLimit.externalAuthentication.blockDurationInSeconds).toBe(300);
         expect(envs.contaAzul.loginUrl).toBe("https://login.example.com");
         expect(envs.contaAzul.headless).toBe(true);
     });

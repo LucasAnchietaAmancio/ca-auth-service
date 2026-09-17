@@ -12,13 +12,17 @@
 - [x] Cache Redis de sessão por empresa com TTL.
 - [x] Criação e conexão do cliente Redis no bootstrap; adapter recebe o cliente pronto por injeção.
 - [x] Erros de cache padronizados: `CACHE_CONNECTION_FAILED`, `CACHE_READ_FAILED`, `CACHE_WRITE_FAILED` e `INVALID_CACHED_SESSION`.
+- [x] Rate limit Redis por IP na rota de sessão e por empresa antes do login Puppeteer.
+- [x] Autenticação Bearer para todas as rotas `/v1` com token configurado em `API_ACCESS_TOKEN`.
 - [x] Testes unitários e typecheck.
 
 ## Fora do escopo imediato
 
+- [ ] Autenticação, autorização e rate limit da API.
 - [ ] Testes de integração Redis/PostgreSQL.
 - [ ] Teste controlado do login real com Conta Azul.
-- [ ] Autenticação, autorização e rate limit da API.
+- [ ] Adicionar nova rota de sessão e tirar a logica da roda de company.
+- [ ] Ao invés de ter dois adapters de Cache centralizalos em 1 só que atende os 2 objetivos, de sessão e rate limit.
 
 ## Necessário antes de produção
 
