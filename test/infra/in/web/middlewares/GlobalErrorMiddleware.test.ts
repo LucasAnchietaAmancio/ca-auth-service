@@ -1,10 +1,11 @@
 import { jest } from "@jest/globals";
 import type { NextFunction, Request, Response } from "express";
 
-import GlobalErrorMiddleware from "../../../../../src/infra/in/web/middlewares/GlobalErrorMiddleware.js";
+import GlobalErrorMiddleware from "@middlewares/GlobalErrorMiddleware.js";
 import CompanyNotFoundError from "@exceptions/CompanyNotFoundError.js";
 import DatabaseException from "@exceptions/DatabaseException.js";
 import InvalidInputParams from "@exceptions/InvalidInputParams.js";
+import CacheException from "@exceptions/CacheException.js";
 
 describe("GlobalErrorMiddleware", () => {
     it("Deve converter um erro de entrada inválida em HTTP 400", () => {
@@ -48,6 +49,23 @@ describe("GlobalErrorMiddleware", () => {
         );
 
         expect(response.status).toHaveBeenCalledWith(409);
+    });
+
+    it("Deve converter falha no cache em HTTP 503", () => {
+        const response = createResponse();
+
+        GlobalErrorMiddleware.handle(
+            new CacheException("Redis indisponível", "CACHE_CONNECTION_FAILED", {}),
+            {} as Request,
+            response as unknown as Response,
+            jest.fn() as NextFunction,
+        );
+
+        expect(response.status).toHaveBeenCalledWith(503);
+        expect(response.json).toHaveBeenCalledWith({
+            success: false,
+            error: { code: "CACHE_CONNECTION_FAILED", message: "Redis indisponível" },
+        });
     });
 
     it("Deve converter erro desconhecido em HTTP 500", () => {

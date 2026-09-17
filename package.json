@@ -26,6 +26,7 @@
     "dotenv": "^16.6.1",
     "express": "^5.2.1",
     "otplib": "^13.5.0",
-    "puppeteer": "^24.43.1"
+    "puppeteer": "^24.43.1",
+    "redis": "^6.2.1"
   }
 }

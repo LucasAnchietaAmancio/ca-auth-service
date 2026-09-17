@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import type { NextFunction, Request, Response } from "express";
-import CreateCompanyController from "../../../../../src/infra/in/web/controllers/CreateCompanyController.js";
+import CreateCompanyController from "@controllers/CreateCompanyController.js";
 import InvalidInputParams from "@exceptions/InvalidInputParams.js";
 import type CreateCompanyUseCasePort from "@ports/in/CreateCompanyUseCasePort.js";
 

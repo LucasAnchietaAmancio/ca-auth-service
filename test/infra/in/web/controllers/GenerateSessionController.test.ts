@@ -1,6 +1,6 @@
 import { jest } from "@jest/globals";
 import type { NextFunction, Request, Response } from "express";
-import GenerateSessionController from "../../../../../src/infra/in/web/controllers/GenerateSessionController.js";
+import GenerateSessionController from "@controllers/GenerateSessionController.js";
 import type GenerateSessionUseCasePort from "@ports/in/GenerateSessionUseCasePort.js";
 import InvalidInputParams from "@exceptions/InvalidInputParams.js";
 import SessionEntity from "@entities/SessionEntity.js";
@@ -9,7 +9,7 @@ describe("GenerateSessionController", () => {
     it("deve solicitar uma sessão para uma empresa", async () => {
         const useCase: jest.Mocked<GenerateSessionUseCasePort> = {
             execute: jest.fn<GenerateSessionUseCasePort["execute"]>().mockResolvedValue(
-                SessionEntity.create("access-token"),
+                SessionEntity.create("access-token", 1_765_000_000),
             ),
         };
         const controller = new GenerateSessionController(useCase);

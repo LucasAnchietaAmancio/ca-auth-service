@@ -2,38 +2,19 @@
 
 ## CompanyEntity
 
-Representa uma empresa cadastrada no serviço.
-
-### Criação
-
-`CompanyEntity.create(companyName, email, password, totpSecret)` gera um `companyId` e valida e-mail, senha e segredo TOTP por value objects.
-
-### Restauração
-
-`CompanyEntity.restore(companyId, companyName, email, encryptedPassword, encryptedTotpSecret)` reconstrói a entidade a partir da persistência.
-
-### Estado atual
-
-A entidade expõe `companyId`, `companyName`, `email`, `password` e `totpSecret`. Senha e segredo são cifrados pelo adapter de criptografia antes da persistência e descriptografados somente durante o login externo.
+Representa a empresa cadastrada. Possui `companyId`, nome, e-mail, senha e segredo TOTP. Senha e segredo são validados em texto claro no cadastro, cifrados antes da persistência e descriptografados apenas para autenticação externa.
 
 ## SessionEntity
 
-Representa o resultado de uma autenticação.
+Representa uma sessão externa em memória/cache. Possui:
 
-### Criação
+- `sessionId`, gerado pela aplicação;
+- `accessToken`, nunca exposto pela API HTTP;
+- `expiresAt`, timestamp Unix em milissegundos;
+- `isExpired()`, que compara `expiresAt` com `Date.now()`.
 
-`SessionEntity.create(accessToken)` gera um `sessionId` e mantém o token externo somente em memória.
-
-### Estado atual
-
-A resposta HTTP expõe somente `sessionId`; o `accessToken` não é devolvido ao cliente. A entidade ainda não possui `companyId`, `authenticatedAt`, expiração ou persistência própria. Esses campos devem ser definidos antes da publicação de eventos.
-
-## Value objects
-
-- `EmailValueObject`: valida e normaliza o e-mail.
-- `PasswordValueObject`: valida a senha conforme as regras atuais do domínio.
-- `TotpSecretValueObject`: valida o segredo TOTP Base32.
+`SessionEntity.restore` reconstrói a entidade a partir do Redis. A sessão atual não tem persistência relacional, histórico, `companyId` próprio ou `authenticatedAt`.
 
 ## Exceções
 
-O domínio e a aplicação já possuem exceções para entrada inválida, e-mail inválido, senha inválida, empresa inexistente, duplicidade e falhas de banco. A classificação de falhas externas do Conta Azul ainda precisa ser criada.
+As exceções padronizadas expõem `message`, `tag` e, quando aplicável, `payload`. Para cache, os códigos atuais são `CACHE_CONNECTION_FAILED`, `CACHE_READ_FAILED`, `CACHE_WRITE_FAILED` e `INVALID_CACHED_SESSION`.

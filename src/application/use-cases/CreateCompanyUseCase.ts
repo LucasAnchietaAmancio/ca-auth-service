@@ -1,6 +1,6 @@
 import type CreateCompanyUseCasePort from "@ports/in/CreateCompanyUseCasePort.js";
 import type CompanyRepositoryPort from "@ports/out/CompanyRepositoryPort.js";
-import type CryptoHashAdapterPort from "@ports/out/CryptoHashAdapterPort.js";
+import type CryptoHashAdapterPort from "@ports/out/EncryptAdapterPort.js";
 import type CreateCompanyDto from "@dto/CreateCompanyDto.js";
 import CompanyEntity from "@entities/CompanyEntity.js";
 import UserAlreadyExists from "@exceptions/UserAlreadyExists.js";

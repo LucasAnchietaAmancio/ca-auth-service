@@ -1,4 +1,4 @@
 
-export default interface OtplibTotpAdapterPort {
+export default interface TotpAdapterPort {
     execute(totpSecret: string): Promise<string>;
 }

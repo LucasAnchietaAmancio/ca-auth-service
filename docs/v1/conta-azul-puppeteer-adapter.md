@@ -1,31 +1,22 @@
-# Adapter de login Conta Azul
+# Adapter Puppeteer Conta Azul
 
-O adapter `ContaAzulPuppeteerAuthAdapter` implementa a porta de autenticação externa. Ele recebe e-mail, senha e segredo TOTP já descriptografados pelo caso de uso; não registra esses valores.
+`PuppeteerContaAzulAuthAdapter` implementa a porta de autenticação externa. Recebe e-mail, senha e segredo TOTP já descriptografados em memória e não deve registrá-los em logs.
 
-## Fluxo
+## Fluxo atual
 
-1. Abre `https://login.contaazul.com`.
-2. Envia e-mail e senha.
-3. Gera um código TOTP por `OtplibTotpAdapter` e o envia quando solicitado.
-4. Captura cookies, access token e expiração para criar a sessão em memória.
+1. Abre a URL configurada do Conta Azul.
+2. Preenche e-mail e senha.
+3. Gera e envia o código TOTP.
+4. Aguarda URL autenticada ou mensagem de erro configurada.
+5. Lê os cookies configurados de access token e expiração.
+6. Retorna `accessToken` e `expiresAt` para o caso de uso.
 
-CAPTCHA não é contornado: o adapter encerra o fluxo com `CAPTCHA_REQUIRED`. Alterações de página, credenciais recusadas e falhas de captura são classificadas sem incluir dados sensíveis na mensagem.
+`expiresAt` deve ser fornecido pelo cookie em Unix milissegundos, como `1789673046000`.
 
 ## Configuração
 
-Além de `SECRET_KEY`, configure quando os seletores ou a chave de armazenamento do provedor forem diferentes:
+Todas as variáveis `CONTA_AZUL_*` estão em `.env.example`: URL, modo headless, timeout, seletores, padrão de URL autenticada e nomes dos cookies de token/expiração.
 
-```env
-SECRET_KEY="chave-longa-e-secreta-fora-do-repositorio"
-CONTA_AZUL_LOGIN_URL="https://login.contaazul.com"
-CONTA_AZUL_HEADLESS="true"
-CONTA_AZUL_LOGIN_TIMEOUT_MS="30000"
-CONTA_AZUL_AUTHENTICATED_URL_PATTERN="app.contaazul.com"
-CONTA_AZUL_EMAIL_SELECTOR='input[type="email"]'
-CONTA_AZUL_PASSWORD_SELECTOR='input[type="password"]'
-CONTA_AZUL_SUBMIT_SELECTOR='button[type="submit"]'
-CONTA_AZUL_TOTP_SELECTOR='input[autocomplete="one-time-code"]'
-CONTA_AZUL_ACCESS_TOKEN_STORAGE_KEY="access_token"
-```
+## Limitações
 
-O processo pode ser solicitado por `POST /v1/companies/:companyId/sessions`. Esta etapa ainda não persiste nem publica a sessão; o retorno HTTP expõe somente `sessionId`.
+Os seletores e o fluxo ainda precisam de validação em homologação. CAPTCHA não é contornado e o adapter ainda não possui uma detecção específica para classificá-lo como `CAPTCHA_REQUIRED`; alterações de tela podem resultar em `EXTERNAL_AUTHENTICATION_FAILED` ou timeout.

@@ -2,58 +2,30 @@
 
 ## CreateCompanyUseCase
 
-### Entrada
+Entrada:
 
 ```ts
-{
-  companyName: string;
-  email: string;
-  password: string;
-  totpSecret: string;
-}
+{ companyName: string; email: string; password: string; totpSecret: string }
 ```
 
-### Fluxo atual
-
-1. Valida o e-mail.
-2. Verifica duplicidade pelo repositório.
-3. Cria `CompanyEntity`.
-4. Cifra senha e segredo TOTP.
-5. Persiste a empresa.
-5. Retorna `companyId`.
-
-### Saída
-
-`string` com o identificador da empresa criada.
+Fluxo: valida os dados de domínio, verifica e-mail duplicado, cifra senha e segredo TOTP, persiste a empresa e retorna `companyId`.
 
 ## GenerateSessionUseCase
 
-### Entrada
+Entrada:
 
 ```ts
-{
-  companyId: string;
-}
+{ companyId: string }
 ```
 
-### Fluxo atual
+Fluxo:
 
 1. Busca a empresa pelo `companyId`.
-2. Lança `CompanyNotFoundError` se ela não existir.
-3. Descriptografa senha e segredo TOTP somente em memória.
-4. Envia e-mail, senha e TOTP ao `ContaAzulPuppeteerAuthAdapterPort`.
-5. Cria e retorna uma `SessionEntity` com a resposta do adapter.
+2. Consulta o `SessionCacheAdapterPort`.
+3. Retorna a sessão cacheada se ela ainda não expirou.
+4. Descriptografa senha e segredo TOTP somente em memória.
+5. Executa a porta de autenticação Conta Azul.
+6. Cria `SessionEntity` com o token e `expiresAt` em milissegundos.
+7. Salva a sessão no cache até a expiração e a retorna.
 
-### Limitações atuais
-
-O caso de uso não persiste a sessão, não adquire lock, não publica eventos nem agenda renovação. Ele é exposto por uma entrada HTTP, mas a integração real com o provedor ainda requer validação controlada.
-
-## Próximos casos/portas
-
-- repositório de sessões;
-- proteção/desproteção de credenciais;
-- lock por empresa;
-- publicação de `SessionAuthenticated`;
-- notificação de falhas;
-- entrada HTTP ou mensagem para solicitar a autenticação;
-- scheduler de renovação.
+O caso de uso ainda não usa lock distribuído, persistência histórica, eventos ou renovação agendada.

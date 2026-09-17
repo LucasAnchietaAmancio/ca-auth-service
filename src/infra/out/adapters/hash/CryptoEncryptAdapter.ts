@@ -1,8 +1,8 @@
 import CryptoJS from "crypto-js";
-import type CryptoHashAdapterPort from "@ports/out/CryptoHashAdapterPort.js";
+import type EncryptAdapterPort from "@ports/out/EncryptAdapterPort.js";
 import CryptoException from "@exceptions/CryptoException.js";
 
-export default class CryptoHashAdapter implements CryptoHashAdapterPort {
+export default class CryptoEncryptAdapter implements EncryptAdapterPort {
     constructor(private readonly secretKey: string) {
         if (!secretKey || secretKey.trim().length === 0) throw new CryptoException("A SECRET_KEY não foi fornecida.", "INVALID_SECRET_KEY", {});
     }

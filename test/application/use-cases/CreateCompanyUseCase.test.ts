@@ -1,9 +1,9 @@
 import { jest } from "@jest/globals";
-import CreateCompanyUseCase from "../../../src/application/use-cases/CreateCompanyUseCase.js";
+import CreateCompanyUseCase from "@use-cases/CreateCompanyUseCase.js";
 import CompanyEntity from "@entities/CompanyEntity.js";
 import UserAlreadyExists from "@exceptions/UserAlreadyExists.js";
 import type CompanyRepositoryPort from "@ports/out/CompanyRepositoryPort.js";
-import type CryptoHashAdapterPort from "@ports/out/CryptoHashAdapterPort.js";
+import type CryptoHashAdapterPort from "@ports/out/EncryptAdapterPort.js";
 
 describe("CreateCompanyUseCase", () => {
     it("Deve criar uma empresa com a senha encriptada", async () => {

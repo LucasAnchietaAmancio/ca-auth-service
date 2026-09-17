@@ -7,6 +7,7 @@ import InvalidPasswordException from "@exceptions/InvalidPasswordException.js";
 import UserAlreadyExists from "@exceptions/UserAlreadyExists.js";
 import InvalidTotpException from "@exceptions/InvalidTotpException.js";
 import ExternalAuthenticationException from "@exceptions/ExternalAuthenticationException.js";
+import CacheException from "@exceptions/CacheException.js";
 
 export default class GlobalErrorMiddleware {
     public static handle(error: unknown, request: Request,response: Response, next: NextFunction): void {
@@ -34,6 +35,11 @@ export default class GlobalErrorMiddleware {
         if (error instanceof DatabaseException) {
             const statusCode = error.tag === "DUPLICATE_EMAIL" ? 409 : 503;
             this.send(response, statusCode, error.tag, error.message);
+            return;
+        }
+
+        if (error instanceof CacheException) {
+            this.send(response, 503, error.tag, error.message);
             return;
         }
 

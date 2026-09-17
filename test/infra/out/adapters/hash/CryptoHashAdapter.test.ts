@@ -1,4 +1,4 @@
-import CryptoHashAdapter from "../../../../../src/infra/out/adapters/hash/CryptoHashAdapter.js";
+import CryptoHashAdapter from "@adapters/hash/CryptoEncryptAdapter.js";
 import CryptoException from "@exceptions/CryptoException.js";
 
 describe("CryptoHashAdapter", () => {

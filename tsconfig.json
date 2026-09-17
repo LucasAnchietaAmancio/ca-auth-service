@@ -48,9 +48,11 @@
       "@dto/*.js": ["./src/application/dto/*.ts"],
       "@exceptions/*.js": ["./src/domain/exceptions/*.ts"],
       "@use-cases/*.js": ["./src/application/use-cases/*.ts"],
+      "@adapters/config/*.js": ["./src/infra/out/config/*.ts"],
       "@adapters/*.js": ["./src/infra/out/adapters/*.ts"],
       "@controllers/*.js": ["./src/infra/in/web/controllers/*.ts"],
       "@factories/*.js": ["./src/main/factories/*.ts"],
+      "@config/*.js": ["./src/main/config/*.ts"],
       "@routes/*.js": ["./src/infra/in/web/routes/*.ts"],
       "@middlewares/*.js": ["./src/infra/in/web/middlewares/*.ts"]
     }

@@ -1,40 +1,33 @@
 # Checklist de implementação
 
-O plano detalhado dos próximos incrementos está em [Plano futuro de implementação](future-implementation-plan.md).
+## Entregue
 
-## Entregue nesta versão
+- [x] Cadastro HTTP de empresas em `POST /v1/companies`.
+- [x] Validação de e-mail, senha e segredo TOTP.
+- [x] Cifragem de senha e segredo TOTP antes da persistência.
+- [x] Repositório PostgreSQL/Prisma de empresas.
+- [x] Login Conta Azul por Puppeteer e geração TOTP.
+- [x] `SessionEntity` com `sessionId`, access token e `expiresAt` em milissegundos.
+- [x] `POST /v1/companies/:companyId/sessions`.
+- [x] Cache Redis de sessão por empresa com TTL.
+- [x] Criação e conexão do cliente Redis no bootstrap; adapter recebe o cliente pronto por injeção.
+- [x] Erros de cache padronizados: `CACHE_CONNECTION_FAILED`, `CACHE_READ_FAILED`, `CACHE_WRITE_FAILED` e `INVALID_CACHED_SESSION`.
+- [x] Testes unitários e typecheck.
 
-- [x] `EmailValueObject` e `PasswordValueObject`.
-- [x] `CompanyEntity` e `SessionEntity`.
-- [x] `CreateCompanyUseCase`.
-- [x] `GenerateSessionUseCase` como orquestração inicial.
-- [x] Cifragem reversível de senha e segredo TOTP em repouso.
-- [x] `OtplibTotpAdapter.execute`.
-- [x] `ContaAzulPuppeteerAuthAdapter.execute`.
-- [x] `CompanyRepositoryPort`.
-- [x] `PostgresCompanyRepository`.
-- [x] Migração Prisma da tabela `Company`.
-- [x] `POST /v1/companies` e `POST /v1/companies/:companyId/sessions`.
-- [x] Testes de domínio, casos de uso e controller.
+## Fora do escopo imediato
 
-## Em andamento
+- [ ] Testes de integração Redis/PostgreSQL.
+- [ ] Teste controlado do login real com Conta Azul.
+- [ ] Autenticação, autorização e rate limit da API.
 
-- [ ] Adicionar um lock de sessão.
-- [ ] Validar o adapter Conta Azul contra ambiente de homologação.
+## Necessário antes de produção
 
-## Ainda não implementado
-
-- [ ] Gestão e rotação de chaves para as credenciais cifradas.
-- [ ] Persistência segura do token externo e definição de expiração.
-- [ ] Entidade e repositório de sessão persistida.
 - [ ] Lock distribuído por `companyId`.
-- [ ] Publicação do evento `SessionAuthenticated`.
-- [ ] Renovação automática e scheduler.
-- [ ] Notificação de falhas sem retry automático.
-- [ ] Logs estruturados e observabilidade.
-- [ ] Contrato runtime do evento com o consumidor.
-- [ ] CORS e security headers.
+- [ ] Health/readiness check e encerramento gracioso de Express, Prisma e Redis.
+- [ ] Logs estruturados, métricas e rastreabilidade sem dados sensíveis.
+- [ ] Gestão/rotação de chaves e criptografia autenticada para credenciais em repouso.
+- [ ] TLS, autenticação e política de persistência/backup para PostgreSQL e Redis.
+- [ ] Atualização ou mitigação das dependências vulneráveis reportadas por `npm audit`.
+- [ ] Estratégia de tratamento de CAPTCHA e mudanças de layout da Conta Azul.
 
-## Critério para considerar o fluxo completo
-
-O fluxo só deve ser marcado como concluído quando uma empresa puder solicitar autenticação, obter uma sessão real do Conta Azul, persistir essa sessão, publicar o evento e liberar o lock tanto no sucesso quanto na falha.
+O plano priorizado está em [Plano de produção do MVP](future-implementation-plan.md).

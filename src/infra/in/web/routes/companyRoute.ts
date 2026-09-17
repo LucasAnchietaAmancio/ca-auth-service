@@ -4,16 +4,18 @@ import CreateCompanyControllerFactory from "@factories/CreateCompanyControllerFa
 import CreateCompanyController from "@controllers/CreateCompanyController.js";
 import GenerateSessionControllerFactory from "@factories/GenerateSessionControllerFactory.js";
 import GenerateSessionController from "@controllers/GenerateSessionController.js";
+import type Envs from "@config/Envs.js";
+import type { RedisClientType } from "redis";
 
 export default class CompanyRoute {
     private readonly router: Router;
     private readonly createCompanyController: CreateCompanyController;
     private readonly generateSessionController: GenerateSessionController;
 
-    public constructor(private readonly db: PrismaClient) {
+    public constructor(private readonly db: PrismaClient, envs: Envs, redisClient: RedisClientType) {
         this.router = Router();
-        this.createCompanyController = CreateCompanyControllerFactory.create(this.db);
-        this.generateSessionController = GenerateSessionControllerFactory.create(this.db);
+        this.createCompanyController = CreateCompanyControllerFactory.create(this.db, envs);
+        this.generateSessionController = GenerateSessionControllerFactory.create(this.db, envs, redisClient);
     }
 
     public registerRoutes(): Router {

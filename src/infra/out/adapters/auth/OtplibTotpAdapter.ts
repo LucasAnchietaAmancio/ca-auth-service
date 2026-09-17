@@ -1,9 +1,9 @@
 import { generate } from "otplib";
-import type OtplibTotpAdapterPort from "@ports/out/OtplibTotpAdapterPort.js";
+import type TotpAdapterPort from "@ports/out/TotpAdapterPort.js";
 import InvalidTotpException from "@exceptions/InvalidTotpException.js";
 import TotpSecretValueObject from "@value-objects/TotpSecretValueObject.js";
 
-export default class OtplibTotpAdapter implements OtplibTotpAdapterPort {
+export default class OtplibTotpAdapter implements TotpAdapterPort {
     public async execute(secret: string): Promise<string> {
         try {
             const epoch = Math.floor(Date.now() / 1000);
