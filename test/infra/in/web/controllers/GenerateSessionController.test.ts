@@ -9,7 +9,7 @@ describe("GenerateSessionController", () => {
     it("deve solicitar uma sessão para uma empresa", async () => {
         const useCase: jest.Mocked<GenerateSessionUseCasePort> = {
             execute: jest.fn<GenerateSessionUseCasePort["execute"]>().mockResolvedValue(
-                SessionEntity.create("access-token", 1_765_000_000),
+                SessionEntity.restore("session-id", "access-token", 1_765_000_000),
             ),
         };
         const controller = new GenerateSessionController(useCase);
@@ -26,7 +26,11 @@ describe("GenerateSessionController", () => {
         expect(status).toHaveBeenCalledWith(201);
         expect(json).toHaveBeenCalledWith({
             success: true,
-            payload: { sessionId: expect.any(String) },
+            payload: {
+                sessionId: "session-id",
+                accessToken: "access-token",
+                expiresAt: 1_765_000_000,
+            },
         });
     });
 

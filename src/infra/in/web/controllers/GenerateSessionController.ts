@@ -11,7 +11,7 @@ export default class GenerateSessionController {
             if (typeof companyId !== "string" || !companyId.trim()) throw new InvalidInputParams("companyId é obrigatório", "INVALID_INPUT");
 
             const session = await this.generateSessionUseCase.execute({ companyId: companyId.trim() });
-            response.status(201).json({ success: true, payload: { sessionId: session.sessionId }});
+            response.status(201).json({ success: true, payload: { sessionId: session.sessionId, accessToken: session.accessToken, expiresAt: session.expiresAt } });
         } catch (error) {
             next(error);
         }

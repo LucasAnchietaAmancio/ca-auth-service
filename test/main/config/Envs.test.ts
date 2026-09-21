@@ -1,5 +1,5 @@
 import Envs from "@config/Envs.js";
-import EnvironmentError from "@config/errors/EnvironmentError.js";
+import EnvironmentError from "@domain/exceptions/EnvironmentError.js";
 
 const validEnv: NodeJS.ProcessEnv = {
     DATABASE_URL: "postgresql://user:password@localhost:5432/auth_service",

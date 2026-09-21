@@ -1,4 +1,4 @@
-import EnvironmentError from "@config/errors/EnvironmentError.js";
+import EnvironmentError from "@domain/exceptions/EnvironmentError.js";
 import type RateLimitConfigDto from "@dto/RateLimitConfigDto.js";
 
 interface ParseOptions {
